@@ -15,6 +15,7 @@
 #include <QCheckBox>
 #include <QDate>
 #include <QDesktopWidget>
+#include <QFileInfo>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMimeDatabase>
@@ -398,7 +399,8 @@ RenameDialog::RenameDialog(QWidget *parent, const QString &_caption,
         gridLayout->addWidget(destSizeLabel, gridRow, 2);
 
         // check files contents for local files
-        if (d->dest.isLocalFile() && d->src.isLocalFile()) {
+        if ((d->dest.isLocalFile() && !QFileInfo(d->dest.toLocalFile()).isDir())
+            && (d->src.isLocalFile() && !QFileInfo(d->src.toLocalFile()).isDir())) {
 
             const CompareFilesResult CompareFilesResult = compareFiles(d->src.toLocalFile(), d->dest.toLocalFile());
 
