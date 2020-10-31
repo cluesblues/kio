@@ -17,6 +17,7 @@
 #include <KStringHandler>
 
 #include <kio/jobuidelegateextension.h>
+#include <kio/askuseractioninterface.h>
 #include "slave.h"
 #include "scheduler.h"
 
@@ -60,6 +61,18 @@ void Job::setUiDelegateExtension(JobUiDelegateExtension *extension)
     d->m_uiDelegateExtension = extension;
 }
 
+AskUserActionInterface *Job::askUserActionInterface() const
+{
+    Q_D(const Job);
+    return d->m_askUserActionInterface;
+}
+
+void Job::setAskUserActionInterface(AskUserActionInterface *askUserAction)
+{
+    Q_D(Job);
+    d->m_askUserActionInterface = askUserAction;
+}
+
 bool Job::addSubjob(KJob *jobBase)
 {
     //qDebug() << "addSubjob(" << jobBase << ") this=" << this;
@@ -79,6 +92,7 @@ bool Job::addSubjob(KJob *jobBase)
         job->setProperty("window", property("window")); // see KJobWidgets
         job->setProperty("userTimestamp", property("userTimestamp")); // see KJobWidgets
         job->setUiDelegateExtension(d->m_uiDelegateExtension);
+        job->setAskUserActionInterface(d->m_askUserActionInterface);
     }
     return ok;
 }

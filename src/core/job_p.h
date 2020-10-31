@@ -18,6 +18,7 @@
 #include <KJobTrackerInterface>
 #include <kio/jobuidelegateextension.h>
 #include <kio/jobuidelegatefactory.h>
+#include <kio/askuseractioninterface.h>
 #include <QUrl>
 #include <QPointer>
 #include <QDataStream>
@@ -37,6 +38,7 @@ public:
     JobPrivate()
         : m_parentJob(nullptr), m_extraFlags(0),
           m_uiDelegateExtension(KIO::defaultJobUiDelegateExtension()),
+          m_askUserActionInterface(KIO::defaultAskUserActionInterface()),
           m_privilegeExecutionEnabled(false)
     {
     }
@@ -74,6 +76,7 @@ public:
     MetaData m_internalMetaData;
     MetaData m_outgoingMetaData;
     JobUiDelegateExtension *m_uiDelegateExtension;
+    AskUserActionInterface *m_askUserActionInterface;
     Job *q_ptr;
     // For privilege operation
     bool m_privilegeExecutionEnabled;

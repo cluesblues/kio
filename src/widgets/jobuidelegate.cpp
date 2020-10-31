@@ -15,6 +15,7 @@
 #include "widgetsuntrustedprogramhandler.h"
 #include "widgetsopenwithhandler.h"
 #include "widgetsopenorexecutefilehandler.h"
+#include "widgetsaskuseractionhandler.h"
 
 #include <KConfigGroup>
 #include <KJob>
@@ -49,11 +50,13 @@ KIOGUI_EXPORT void setDefaultOpenOrExecuteFileHandler(KIO::OpenOrExecuteFileInte
 KIO::JobUiDelegate::JobUiDelegate()
     : d(new Private())
 {
-    // KF6 TODO: remove, inherit from WidgetsUntrustedProgramHandler instead
+    // KF6 TODO: remove, inherit from these handlers instead
     static WidgetsUntrustedProgramHandler s_handler;
     KIO::setDefaultUntrustedProgramHandler(&s_handler);
+
     static WidgetsOpenWithHandler s_openUrlHandler;
     KIO::setDefaultOpenWithHandler(&s_openUrlHandler);
+
     static WidgetsOpenOrExecuteFileHandler s_openOrExecuteFileHandler;
     KIO::setDefaultOpenOrExecuteFileHandler(&s_openOrExecuteFileHandler);
 }
@@ -432,12 +435,15 @@ public:
 
 Q_GLOBAL_STATIC(KIOWidgetJobUiDelegateFactory, globalUiDelegateFactory)
 Q_GLOBAL_STATIC(KIO::JobUiDelegate, globalUiDelegate)
+Q_GLOBAL_STATIC(KIO::WidgetsAskUserActionHandler, globalAskUserActionInterface)
 
-// Simply linking to this library, creates a GUI job delegate and delegate extension for all KIO jobs
+// Simply linking to this library, creates a GUI job delegate and delegate extension
+// and AskUserActionInterface for all KIO jobs
 static void registerJobUiDelegate()
 {
     KIO::setDefaultJobUiDelegateFactory(globalUiDelegateFactory());
     KIO::setDefaultJobUiDelegateExtension(globalUiDelegate());
+    KIO::setDefaultAskUserActionInterface(globalAskUserActionInterface());
 }
 
 Q_CONSTRUCTOR_FUNCTION(registerJobUiDelegate)

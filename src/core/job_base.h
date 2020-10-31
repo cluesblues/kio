@@ -16,6 +16,7 @@ namespace KIO
 {
 
 class JobUiDelegateExtension;
+class AskUserActionInterface;
 
 class JobPrivate;
 /**
@@ -77,6 +78,21 @@ public:
      * The default UI delegate extension is KIO::defaultJobUiDelegateExtension()
      */
     void setUiDelegateExtension(JobUiDelegateExtension *extension);
+
+    /**
+     * Retrieves the AskUserActionInterface used by this job.
+     *
+     * @since 5.77
+     */
+    AskUserActionInterface *askUserActionInterface() const;
+
+    /**
+     * Sets the AskUserActionInterface to be used by this job.
+     * The default AskUserActionInterface is KIO::defaultAskUserActionInterface()
+     *
+     * @since 5.77
+     */
+    void setAskUserActionInterface(AskUserActionInterface *askUserAction);
 
 protected:
     /**
