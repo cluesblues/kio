@@ -15,6 +15,7 @@
 #include <KFileCopyToMenu>
 #include "kiotesthelper.h"
 #include "jobuidelegatefactory.h"
+#include <KIO/AskUserActionInterface>
 
 #include <KIO/CopyJob>
 
@@ -38,7 +39,9 @@ private Q_SLOTS:
 
         m_srcFile = m_srcDir + QStringLiteral("/srcfile");
 
-        KIO::setDefaultJobUiDelegateExtension(nullptr); // no "skip" dialogs
+        // no "skip" dialogs
+        KIO::setDefaultJobUiDelegateExtension(nullptr);
+        KIO::setDefaultAskUserActionInterface(nullptr);
 
         // Set a recent dir
         KConfigGroup recentDirsGroup(KSharedConfig::openConfig(), "kuick-copy");

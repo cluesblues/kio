@@ -406,6 +406,7 @@ private Q_SLOTS:
         KIO::DropJob *job = KIO::drop(&dropEvent, destUrl, KIO::HideProgressInfo);
         job->setUiDelegate(nullptr);
         job->setUiDelegateExtension(nullptr); // no rename dialog
+        job->setAskUserActionInterface(nullptr);
         JobSpy jobSpy(job);
         qRegisterMetaType<KFileItemListProperties>();
         QSignalSpy spyShow(job, &KIO::DropJob::popupMenuAboutToShow);
