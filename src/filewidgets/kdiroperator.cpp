@@ -39,6 +39,7 @@
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KJobWidgets>
+#include <KIO/AskUserActionInterface>
 #include <kio/deletejob.h>
 #include <kio/copyjob.h>
 #include <kio/jobuidelegate.h>
@@ -793,10 +794,36 @@ KIO::DeleteJob *KDirOperator::del(const KFileItemList &items,
 
 void KDirOperator::deleteSelected()
 {
-    const KFileItemList list = selectedItems();
-    if (!list.isEmpty()) {
-        del(list, this);
+    const QList<QUrl> urls = selectedItems().urlList();
+    if (urls.isEmpty()) {
+        KMessageBox::information(this,
+                                 i18n("You did not select a file to delete."),
+                                 i18n("Nothing to Delete"));
+        return;
     }
+
+    KIO::JobUiDelegate uiDelegate;
+    uiDelegate.setWindow(this);
+
+    connect(KIO::defaultAskUserActionInterface(), &KIO::AskUserActionInterface::askUserDeleteResult, this,
+            [this, urls](bool allowDelete, QWidget *parent) {
+        // Receive askUserDeleteResult signal once per askUser dialog
+        disconnect(KIO::defaultAskUserActionInterface(), &KIO::AskUserActionInterface::askUserDeleteResult,
+                   this, nullptr);
+
+        if (parent != this || !allowDelete) {
+            return;
+        }
+
+        KIO::DeleteJob *job = KIO::del(urls, KIO::DefaultFlags);
+        KJobWidgets::setWindow(job, this);
+        job->uiDelegate()->setAutoErrorHandlingEnabled(true);
+    });
+
+    KIO::defaultAskUserActionInterface()->askUserDelete(urls,
+                                                        KIO::AskUserActionInterface::Delete,
+                                                        KIO::AskUserActionInterface::DefaultConfirmation,
+                                                        this);
 }
 
 KIO::CopyJob *KDirOperator::trash(const KFileItemList &items,
@@ -897,10 +924,36 @@ void KDirOperator::trashSelected()
         return;
     }
 
-    const KFileItemList list = selectedItems();
-    if (!list.isEmpty()) {
-        trash(list, this);
+    const QList<QUrl> urls = selectedItems().urlList();
+    if (urls.isEmpty()) {
+        KMessageBox::information(this,
+                                 i18n("You did not select a file to trash."),
+                                 i18n("Nothing to Trash"));
+        return;
     }
+
+    KIO::JobUiDelegate uiDelegate;
+    uiDelegate.setWindow(this);
+
+    connect(KIO::defaultAskUserActionInterface(), &KIO::AskUserActionInterface::askUserDeleteResult, this,
+            [this, urls](bool allowDelete, QWidget *parent) {
+        // Receive askUserDeleteResult signal once per askUser dialog
+        disconnect(KIO::defaultAskUserActionInterface(), &KIO::AskUserActionInterface::askUserDeleteResult,
+                   this, nullptr);
+
+        if (parent != this || !allowDelete) {
+            return;
+        }
+
+        KIO::CopyJob *job = KIO::trash(urls);
+        KJobWidgets::setWindow(job, this);
+        job->uiDelegate()->setAutoErrorHandlingEnabled(true);
+    });
+
+    KIO::defaultAskUserActionInterface()->askUserDelete(urls,
+                                                        KIO::AskUserActionInterface::Trash,
+                                                        KIO::AskUserActionInterface::DefaultConfirmation,
+                                                        this);
 }
 
 #if KIOFILEWIDGETS_BUILD_DEPRECATED_SINCE(5, 76)
