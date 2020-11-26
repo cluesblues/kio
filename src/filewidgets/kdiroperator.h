@@ -527,6 +527,7 @@ public:
     virtual bool mkdir(const QString &directory, bool enterDirectory = true);
 #endif
 
+#if KIOFILEWIDGETS_BUILD_DEPRECATED_SINCE(5, 77)
     /**
      * Starts and returns a KIO::DeleteJob to delete the given @p items.
      *
@@ -535,8 +536,10 @@ public:
      * @param ask specifies whether a confirmation dialog should be shown
      * @param showProgress passed to the DeleteJob to show a progress dialog
      */
+    KIOFILEWIDGETS_DEPRECATED_VERSION(5, 77, "Deprecated for lack of usage.")
     virtual KIO::DeleteJob *del(const KFileItemList &items, QWidget *parent = nullptr,
                                 bool ask = true, bool showProgress = true);
+#endif
 
     /**
      * Clears the forward and backward history.

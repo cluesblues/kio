@@ -757,6 +757,7 @@ bool KDirOperator::mkdir(const QString &directory, bool enterDirectory)
 }
 #endif
 
+#if KIOFILEWIDGETS_BUILD_DEPRECATED_SINCE(5, 77)
 KIO::DeleteJob *KDirOperator::del(const KFileItemList &items,
                                   QWidget *parent,
                                   bool ask, bool showProgress)
@@ -791,12 +792,28 @@ KIO::DeleteJob *KDirOperator::del(const KFileItemList &items,
 
     return nullptr;
 }
+#endif
 
 void KDirOperator::deleteSelected()
 {
-    const KFileItemList list = selectedItems();
-    if (!list.isEmpty()) {
-        del(list, this);
+    const KFileItemList items = selectedItems();
+    if (items.isEmpty()) {
+        KMessageBox::information(this,
+                                 i18n("You did not select a file to delete."),
+                                 i18n("Nothing to Delete"));
+        return;
+    }
+
+    const QList<QUrl> urls = items.urlList();
+
+    KIO::JobUiDelegate uiDelegate;
+    uiDelegate.setWindow(this);
+    const bool doIt = uiDelegate.askDeleteConfirmation(urls, KIO::JobUiDelegate::Delete, KIO::JobUiDelegate::DefaultConfirmation);
+
+    if (doIt) {
+        KIO::DeleteJob *job = KIO::del(urls);
+        KJobWidgets::setWindow(job, this);
+        job->uiDelegate()->setAutoErrorHandlingEnabled(true);
     }
 }
 
