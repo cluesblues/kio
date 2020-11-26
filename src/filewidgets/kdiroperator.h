@@ -596,6 +596,7 @@ public:
      */
     virtual void setDropOptions(int options);
 
+#if KIOFILEWIDGETS_BUILD_DEPRECATED_SINCE(5, 77)
     /**
      * Starts and returns a KIO::CopyJob to trash the given @p items.
      *
@@ -604,8 +605,10 @@ public:
      * @param ask specifies whether a confirmation dialog should be shown
      * @param showProgress passed to the CopyJob to show a progress dialog
      */
+    KIOFILEWIDGETS_DEPRECATED_VERSION(5, 77, "Deprecated for lack of usage.")
     virtual KIO::CopyJob *trash(const KFileItemList &items, QWidget *parent,
                                 bool ask = true, bool showProgress = true);
+#endif
 
     /**
       * Returns the preview generator for the current view.

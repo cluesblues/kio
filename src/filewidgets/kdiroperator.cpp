@@ -817,6 +817,7 @@ void KDirOperator::deleteSelected()
     }
 }
 
+#if KIOFILEWIDGETS_BUILD_DEPRECATED_SINCE(5, 77)
 KIO::CopyJob *KDirOperator::trash(const KFileItemList &items,
                                   QWidget *parent,
                                   bool ask, bool showProgress)
@@ -847,6 +848,7 @@ KIO::CopyJob *KDirOperator::trash(const KFileItemList &items,
 
     return nullptr;
 }
+#endif
 
 KFilePreviewGenerator *KDirOperator::previewGenerator() const
 {
@@ -915,9 +917,24 @@ void KDirOperator::trashSelected()
         return;
     }
 
-    const KFileItemList list = selectedItems();
-    if (!list.isEmpty()) {
-        trash(list, this);
+    const KFileItemList items = selectedItems();
+
+    if (items.isEmpty()) {
+        KMessageBox::information(this,
+                                 i18n("You did not select a file to trash."),
+                                 i18n("Nothing to Trash"));
+        return;
+    }
+
+    KIO::JobUiDelegate uiDelegate;
+    uiDelegate.setWindow(this);
+    const QList<QUrl> urls = items.urlList();
+    const bool doIt = uiDelegate.askDeleteConfirmation(urls, KIO::JobUiDelegate::Trash, KIO::JobUiDelegate::DefaultConfirmation);
+
+    if (doIt) {
+        KIO::CopyJob *job = KIO::trash(urls);
+        KJobWidgets::setWindow(job, this);
+        job->uiDelegate()->setAutoErrorHandlingEnabled(true);
     }
 }
 
